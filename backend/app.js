@@ -1,0 +1,35 @@
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
+const authRoutes = require('./routes/auth');
+const notesRoutes = require('./routes/notes');
+const tenantRoutes = require('./routes/tenant');
+const tenantResolver = require('./middleware/tenantResolver');
+
+const app = express();
+
+app.use(helmet());
+app.use(cors());
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+app.use(express.json());
+
+// Health check (no tenant required)
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
+// Tenant creation route (no tenant middleware)
+app.use('/api/tenants', tenantRoutes);
+
+// Apply tenant middleware to other routes
+app.use('/api', tenantResolver);
+
+// Other routes (require tenant)
+app.use('/api/auth', authRoutes);
+app.use('/api/notes', notesRoutes);
+
+module.exports = app;
+
+
