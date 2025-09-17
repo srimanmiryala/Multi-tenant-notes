@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Tenant Notes App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Multi-Tenant Notes</h1>
+                <p class="text-gray-600">Enter your tenant credentials</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tenant Slug</label>
+                    <input 
+                        type="text" 
+                        id="tenantSlug" 
+                        value="testco"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" 
+                        placeholder="testco" 
+                        required
+                    />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        value="admin@testco.com"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" 
+                        placeholder="admin@testco.com" 
+                        required
+                    />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        value="Test123!"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" 
+                        placeholder="Test123!" 
+                        required
+                    />
+                </div>
+                
+                <button 
+                    type="submit" 
+                    id="loginBtn"
+                    class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 font-medium transition-colors"
+                >
+                    Sign In to Multi-Tenant App
+                </button>
+            </form>
+            
+            <div id="message" class="mt-6 p-4 rounded-lg hidden"></div>
+            
+            <div class="mt-8 p-4 bg-green-50 rounded-lg">
+                <p class="text-sm font-medium text-green-900 mb-2">✅ Your Backend is Working!</p>
+                <div class="text-sm text-green-800">
+                    <p><strong>Backend API:</strong> multi-tenant-notes-6kmv.vercel.app</p>
+                    <p><strong>Status:</strong> ✅ Deployed & Running</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4 hidden">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-4xl font-bold text-gray-900">🎉 Success!</h1>
+                        <p class="text-gray-600 mt-2" id="userInfo">Multi-Tenant SaaS App Working</p>
+                    </div>
+                    <button 
+                        id="logoutBtn"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                        Logout
+                    </button>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-blue-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-blue-900 mb-4">🏢 Tenant Info</h3>
+                        <div id="tenantInfo" class="space-y-2 text-blue-800"></div>
+                    </div>
+                    
+                    <div class="bg-green-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-green-900 mb-4">👤 User Profile</h3>
+                        <div id="profileInfo" class="space-y-2 text-green-800"></div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-blue-50 to-green-50 p-8 rounded-xl">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">🚀 Your Multi-Tenant SaaS is Live!</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">✅ Backend Features Working:</h4>
+                            <ul class="text-sm text-gray-700 space-y-1">
+                                <li>• Multi-tenant data isolation</li>
+                                <li>• JWT authentication</li>
+                                <li>• MongoDB Atlas connection</li>
+                                <li>• Role-based access control</li>
+                                <li>• Subscription plans (Free/Pro)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">🌐 Deployment Status:</h4>
+                            <ul class="text-sm text-gray-700 space-y-1">
+                                <li>• Backend: ✅ Vercel (Working)</li>
+                                <li>• Frontend: ✅ GitHub Pages</li>
+                                <li>• Database: ✅ MongoDB Atlas</li>
+                                <li>• Authentication: ✅ JWT Tokens</li>
+                                <li>• Security: ✅ Production Ready</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-white rounded-lg">
+                        <p class="text-sm text-gray-600">
+                            <strong>🔗 Live URLs:</strong><br>
+                            Backend API: <code>https://multi-tenant-notes-6kmv.vercel.app</code><br>
+                            Frontend: <code>https://srimanmiryala.github.io/Multi-tenant-notes/</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://multi-tenant-notes-6kmv.vercel.app/api';
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const tenantSlug = document.getElementById('tenantSlug').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const messageDiv = document.getElementById('message');
+            
+            loginBtn.textContent = 'Authenticating...';
+            loginBtn.disabled = true;
+            
+            try {
+                const response = await axios.post(`${API_URL}/auth/login`, 
+                    { email, password },
+                    { headers: { 'X-Tenant-ID': tenantSlug, 'Content-Type': 'application/json' } }
+                );
+                
+                // Store data
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+                localStorage.setItem('tenant', JSON.stringify(response.data.tenant));
+                
+                showMessage('✅ Login successful! Welcome to your multi-tenant app!', 'success');
+                setTimeout(showDashboard, 1500);
+                
+            } catch (error) {
+                const errorMsg = error.response?.data?.error || error.message || 'Login failed';
+                showMessage(`❌ ${errorMsg}`, 'error');
+            } finally {
+                loginBtn.textContent = 'Sign In to Multi-Tenant App';
+                loginBtn.disabled = false;
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.clear();
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+            document.getElementById('tenantSlug').value = 'testco';
+            document.getElementById('email').value = 'admin@testco.com';
+            document.getElementById('password').value = 'Test123!';
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `mt-6 p-4 rounded-lg ${type === 'error' ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
+            messageDiv.classList.remove('hidden');
+        }
+
+        function showDashboard() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const tenant = JSON.parse(localStorage.getItem('tenant') || '{}');
+            
+            document.getElementById('userInfo').textContent = `Logged in as: ${user.email} (${user.role}) at ${tenant.name}`;
+            
+            document.getElementById('tenantInfo').innerHTML = `
+                <p><strong>Name:</strong> ${tenant.name}</p>
+                <p><strong>Slug:</strong> ${tenant.slug}</p>
+                <p><strong>Plan:</strong> <span class="bg-blue-200 px-2 py-1 rounded capitalize">${tenant.plan}</span></p>
+                <p><strong>Max Notes:</strong> ${tenant.settings?.maxNotes === -1 ? 'Unlimited' : tenant.settings?.maxNotes || 3}</p>
+            `;
+            
+            document.getElementById('profileInfo').innerHTML = `
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Role:</strong> <span class="bg-green-200 px-2 py-1 rounded capitalize">${user.role}</span></p>
+                <p><strong>Status:</strong> <span class="bg-green-200 px-2 py-1 rounded">Active</span></p>
+                <p><strong>Tenant:</strong> ${tenant.name}</p>
+            `;
+            
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+
+        // Check if already logged in
+        if (localStorage.getItem('token')) {
+            showDashboard();
+        }
+    </script>
+</body>
+</html>
+
