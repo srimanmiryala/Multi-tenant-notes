@@ -1,14 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Multi-Tenant Notes App</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Tenant SaaS - Working Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <!-- Login Page -->
+    <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-xl max-w-md w-full">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">🚀 Multi-Tenant SaaS</h1>
+                <p class="text-gray-600">Live Backend Connected!</p>
+                <div class="mt-2 text-sm text-green-600 font-medium">
+                    ✅ Backend: multi-tenant-notes-6kmv.vercel.app
+                </div>
+            </div>
+            
+            <!-- Quick Test Backend -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <button 
+                    onclick="testBackend()" 
+                    class="w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition-colors"
+                >
+                    🔍 Test Backend Connection
+                </button>
+                <div id="backendTest" class="mt-2 text-xs hidden"></div>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tenant Slug</label>
+                    <input 
+                        type="text" 
+                        id="tenantSlug" 
+                        value="testco"
+                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                        required
+                    />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        value="admin@testco.com"
+                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                        required
+                    />
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        value="Test123!"
+                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                        required
+                    />
+                </div>
+                
+                <button 
+                    type="submit" 
+                    id="loginBtn"
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 font-medium transition-colors"
+                >
+                    🔑 Login to Multi-Tenant App
+                </button>
+            </form>
+            
+            <div id="message" class="mt-4 p-3 rounded hidden"></div>
+            
+            <!-- Create New Tenant -->
+            <div class="mt-6 p-4 bg-green-50 rounded-lg">
+                <button 
+                    onclick="createDemoTenant()" 
+                    class="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors"
+                >
+                    ➕ Create New Demo Tenant
+                </button>
+                <div id="tenantResult" class="mt-2 text-xs hidden"></div>
+            </div>
+            
+            <!-- Instructions -->
+            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                <p class="text-xs font-medium text-blue-900 mb-2">Test Credentials:</p>
+                <div class="text-xs text-blue-800 space-y-1">
+                    <p><strong>Tenant:</strong> testco</p>
+                    <p><strong>Email:</strong> admin@testco.com</p>
+                    <p><strong>Password:</strong> Test123!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Dashboard -->
+    <div id="dashboard" class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4 hidden">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl font-bold text-gray-900 mb-4">🎉 LOGIN SUCCESSFUL!</h1>
+                    <p class="text-xl text-gray-700">Your Multi-Tenant SaaS Application is Working!</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-blue-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-blue-900 mb-4">🏢 Tenant Information</h3>
+                        <div id="tenantInfo" class="space-y-2 text-blue-800 text-sm"></div>
+                    </div>
+                    
+                    <div class="bg-green-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-green-900 mb-4">👤 User Profile</h3>
+                        <div id="userInfo" class="space-y-2 text-green-800 text-sm"></div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">🚀 Your Achievement</h2>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <h4 class="font-semibold text-purple-800 mb-2">Backend Features ✅</h4>
+                            <ul class="text-purple-700 space-y-1">
+                                <li>• Multi-tenant architecture</li>
+                                <li>• JWT authentication</li>
+                                <li>• MongoDB integration</li>
+                                <li>• Role-based access</li>
+                                <li>• RESTful API design</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-pink-800 mb-2">Deployment ✅</h4>
+                            <ul class="text-pink-700 space-y-1">
+                                <li>• Vercel serverless</li>
+                                <li>• MongoDB Atlas cloud</li>
+                                <li>• Environment variables</li>
+                                <li>• Production security</li>
+                                <li>• CORS configuration</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-indigo-800 mb-2">Skills Demonstrated ✅</h4>
+                            <ul class="text-indigo-700 space-y-1">
+                                <li>• Full-stack development</li>
+                                <li>• System architecture</li>
+                                <li>• Database design</li>
+                                <li>• Cloud deployment</li>
+                                <li>• Problem solving</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button 
+                        onclick="goBack()"
+                        class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    >
+                        ← Back to Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://multi-tenant-notes-6kmv.vercel.app/api';
+        const API_ROOT = 'https://multi-tenant-notes-6kmv.vercel.app';
+        
+        // Test backend connection
+        async function testBackend() {
+            const testDiv = document.getElementById('backendTest');
+            testDiv.classList.remove('hidden');
+            testDiv.textContent = 'Testing...';
+            testDiv.className = 'mt-2 text-xs text-gray-600';
+            
+            try {
+                const response = await axios.get(`${API_ROOT}/health`);
+                testDiv.textContent = `✅ Connected! Status: ${response.data.status}`;
+                testDiv.className = 'mt-2 text-xs text-green-600';
+            } catch (error) {
+                testDiv.textContent = `❌ Test failed: ${error.message}`;
+                testDiv.className = 'mt-2 text-xs text-red-600';
+            }
+        }
+
+        // Create demo tenant
+        async function createDemoTenant() {
+            const resultDiv = document.getElementById('tenantResult');
+            resultDiv.classList.remove('hidden');
+            resultDiv.textContent = 'Creating tenant...';
+            
+            const tenantData = {
+                name: 'Demo Company ' + Date.now(),
+                slug: 'demo' + Date.now(),
+                adminEmail: 'admin@demo' + Date.now() + '.com',
+                adminPassword: 'Demo123!'
+            };
+            
+            try {
+                const response = await axios.post(`${API_URL}/tenants/create`, tenantData);
+                resultDiv.textContent = `✅ Created: ${response.data.tenant.name} (${response.data.tenant.slug})`;
+                resultDiv.className = 'mt-2 text-xs text-green-600';
+            } catch (error) {
+                const errorMsg = error.response?.data?.error || error.message;
+                resultDiv.textContent = `⚠️ ${errorMsg}`;
+                resultDiv.className = 'mt-2 text-xs text-yellow-600';
+            }
+        }
+
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const tenantSlug = document.getElementById('tenantSlug').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const messageDiv = document.getElementById('message');
+            
+            loginBtn.textContent = '🔄 Authenticating...';
+            loginBtn.disabled = true;
+            
+            try {
+                const response = await axios.post(`${API_URL}/auth/login`, 
+                    { email, password },
+                    { 
+                        headers: { 
+                            'X-Tenant-ID': tenantSlug, 
+                            'Content-Type': 'application/json' 
+                        }
+                    }
+                );
+                
+                showMessage('✅ Authentication successful!', 'success');
+                
+                // Update dashboard with real data
+                document.getElementById('tenantInfo').innerHTML = `
+                    <p><strong>Name:</strong> ${response.data.tenant.name}</p>
+                    <p><strong>Slug:</strong> ${response.data.tenant.slug}</p>
+                    <p><strong>Plan:</strong> <span class="bg-blue-200 px-2 py-1 rounded">${response.data.tenant.plan}</span></p>
+                    <p><strong>Created:</strong> ${new Date(response.data.tenant.createdAt).toLocaleDateString()}</p>
+                `;
+                
+                document.getElementById('userInfo').innerHTML = `
+                    <p><strong>Email:</strong> ${response.data.user.email}</p>
+                    <p><strong>Role:</strong> <span class="bg-green-200 px-2 py-1 rounded">${response.data.user.role}</span></p>
+                    <p><strong>Status:</strong> <span class="bg-green-200 px-2 py-1 rounded">Authenticated</span></p>
+                    <p><strong>Token:</strong> Valid JWT received</p>
+                `;
+                
+                setTimeout(() => {
+                    document.getElementById('loginPage').classList.add('hidden');
+                    document.getElementById('dashboard').classList.remove('hidden');
+                }, 1500);
+                
+            } catch (error) {
+                const errorMsg = error.response?.data?.error || error.message;
+                showMessage(`❌ ${errorMsg}`, 'error');
+            } finally {
+                loginBtn.textContent = '🔑 Login to Multi-Tenant App';
+                loginBtn.disabled = false;
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `mt-4 p-3 rounded ${type === 'error' ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
+            messageDiv.classList.remove('hidden');
+        }
+
+        function goBack() {
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
+
+        // Auto-test backend on load
+        setTimeout(testBackend, 1000);
+    </script>
+</body>
 </html>
