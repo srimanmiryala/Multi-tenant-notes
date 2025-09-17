@@ -29,6 +29,20 @@ app.use('/api', tenantResolver);
 // Other routes (require tenant)
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', notesRoutes);
+// Root route (add this after the health check)
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Multi-tenant Notes API',
+    status: 'running',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      createTenant: '/api/tenants/create',
+      login: '/api/auth/login'
+    }
+  });
+});
+
 
 module.exports = app;
 
